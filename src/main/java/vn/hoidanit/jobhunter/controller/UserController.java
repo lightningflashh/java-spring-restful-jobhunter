@@ -2,6 +2,8 @@ package vn.hoidanit.jobhunter.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,30 +24,35 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/user/{id}")
-    public User getUserById(@PathVariable("id") long id) {
-        return this.userService.fetchUserById(id);
+    @GetMapping("/users/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
+        User curUser = this.userService.fetchUserById(id);
+        return ResponseEntity.ok(curUser);
     }
 
-    @GetMapping("/user")
-    public List<User> getAllUsers() {
-        return this.userService.fetchAllUsers();
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUsers() {
+        List<User> users = this.userService.fetchAllUsers();
+        return ResponseEntity.ok(users);
     }
 
-    @PostMapping("/user")
-    public User createNewUser(@RequestBody User user) {
-        return this.userService.handleCreateUser(user);
+    @PostMapping("/users")
+    public ResponseEntity<User> createNewUser(@RequestBody User user) {
+        User newUser = this.userService.handleCreateUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
-    @PutMapping("/user")
-    public User updateUser(@RequestBody User user) {
-        return this.userService.handleCreateUser(user);
+    @PutMapping("/users")
+    public ResponseEntity<User> updateUser(@RequestBody User user) {
+        User updatedUser = this.userService.handleCreateUser(user);
+        return ResponseEntity.ok(updatedUser);
     }
 
-    @DeleteMapping("/user/{id}")
-    public String deleteUser(@PathVariable("id") long id) {
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") long id) { // Void là không trả ra body
         this.userService.handleDeleteUser(id);
-        return "Delete successfully!";
+        // return ResponseEntity.ok("Delete successfully!");
+        return ResponseEntity.noContent().build();
     }
 
 }
