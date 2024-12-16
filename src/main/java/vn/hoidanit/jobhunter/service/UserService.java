@@ -44,4 +44,8 @@ public class UserService {
         return this.userRepository.findAll();
     }
 
+    public User handleGetUserByUsername(String username) {
+        return this.userRepository.findByEmail(username); // Perfect case
+    }
+
 }
