@@ -40,6 +40,7 @@ public class AuthController {
 
         // create a token
         String accessToken = this.securityUtil.createToken(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         RestLoginDTO res = new RestLoginDTO();
         res.setAccessToken(accessToken);
