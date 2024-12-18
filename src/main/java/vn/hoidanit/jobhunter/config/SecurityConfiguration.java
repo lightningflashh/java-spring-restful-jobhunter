@@ -22,10 +22,12 @@ public class SecurityConfiguration {
         }
 
         @Bean
-        public SecurityFilterChain filterChain(HttpSecurity http,
+        public SecurityFilterChain filterChain(
+                        HttpSecurity http,
                         CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
                 http
                                 .csrf(c -> c.disable())
+                                .cors(Customizer.withDefaults())
                                 .authorizeHttpRequests(
                                                 authz -> authz
                                                                 .requestMatchers("/", "/login").permitAll()
@@ -34,13 +36,13 @@ public class SecurityConfiguration {
                                                 .authenticationEntryPoint(customAuthenticationEntryPoint))
                                 // .exceptionHandling(
                                 // exceptions -> exceptions
-                                // .authenticationEntryPoint(
-                                // new BearerTokenAuthenticationEntryPoint()) // 401
-                                // .accessDeniedHandler(
-                                // new BearerTokenAccessDeniedHandler())) // 403
+                                // .authenticationEntryPoint(customAuthenticationEntryPoint) // 401
+                                // .accessDeniedHandler(new BearerTokenAccessDeniedHandler())) // 403
+
                                 .formLogin(f -> f.disable())
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
                 return http.build();
         }
 }
