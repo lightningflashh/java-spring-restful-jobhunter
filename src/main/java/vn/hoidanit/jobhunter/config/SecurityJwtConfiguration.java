@@ -16,7 +16,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
 
-import vn.hoidanit.jobhunter.util.SecurityUtil;
+import vn.hoidanit.jobhunter.util.SecurityUtils;
 
 @Configuration
 public class SecurityJwtConfiguration {
@@ -29,7 +29,7 @@ public class SecurityJwtConfiguration {
     @Bean
     public JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(
-                getSecretKey()).macAlgorithm(SecurityUtil.JWT_ALGORITHM).build();
+                getSecretKey()).macAlgorithm(SecurityUtils.JWT_ALGORITHM).build();
         return token -> { // token này là Filter trả về
             try {
                 return jwtDecoder.decode(token);
@@ -47,7 +47,7 @@ public class SecurityJwtConfiguration {
 
     private SecretKey getSecretKey() {
         byte[] keyBytes = Base64.from(jwtKey).decode();
-        return new SecretKeySpec(keyBytes, 0, keyBytes.length, SecurityUtil.JWT_ALGORITHM.getName());
+        return new SecretKeySpec(keyBytes, 0, keyBytes.length, SecurityUtils.JWT_ALGORITHM.getName());
     }
 
     // Lưu data vào Security Context sau khi giải mã token

@@ -12,16 +12,16 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.dto.LoginDTO;
 import vn.hoidanit.jobhunter.domain.dto.RestLoginDTO;
-import vn.hoidanit.jobhunter.util.SecurityUtil;
+import vn.hoidanit.jobhunter.util.SecurityUtils;
 
 @RestController
 public class AuthController {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    private final SecurityUtil securityUtil;
+    private final SecurityUtils securityUtil;
 
-    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil) {
+    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtils securityUtil) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
     }
