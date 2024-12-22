@@ -8,9 +8,13 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import vn.hoidanit.jobhunter.util.SecurityUtils;
 import vn.hoidanit.jobhunter.util.constant.GenderEnum;
 
 @Entity
@@ -24,16 +28,18 @@ public class User {
 
     private String name;
 
+    @NotBlank(message = "email không được để trống")
     private String email;
 
+    @NotBlank(message = "password không được để trống")
     private String password;
-
-    private String address;
 
     private int age;
 
     @Enumerated(EnumType.STRING)
     private GenderEnum gender;
+
+    private String address;
 
     private String refreshToken;
 
@@ -44,4 +50,22 @@ public class User {
     private String createdBy;
 
     private String updatedBy;
+
+    @PrePersist
+    public void handleBeforeCreate() {
+        this.createdBy = SecurityUtils.getCurrentUserLogin().isPresent() == true
+                ? SecurityUtils.getCurrentUserLogin().get()
+                : "";
+
+        this.createdAt = Instant.now();
+    }
+
+    @PreUpdate
+    public void handleBeforeUpdate() {
+        this.updatedBy = SecurityUtils.getCurrentUserLogin().isPresent() == true
+                ? SecurityUtils.getCurrentUserLogin().get()
+                : "";
+
+        this.updatedAt = Instant.now();
+    }
 }
