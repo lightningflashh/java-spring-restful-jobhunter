@@ -17,6 +17,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
+import vn.hoidanit.jobhunter.domain.dto.ResLoginDTO;
+
 @Service
 public class SecurityUtils {
     private final JwtEncoder jwtEncoder;
@@ -26,8 +28,11 @@ public class SecurityUtils {
     @Value("${cheesethank.jwt.base64-secret}")
     public String jwtKey;
 
-    @Value("${cheesethank.jwt.token-validity-in-seconds}")
-    private long jwtExpiration;
+    @Value("${cheesethank.jwt.access-token-validity-in-seconds}")
+    private long accessTokenExpiration;
+
+    @Value("${cheesethank.jwt.refresh-token-validity-in-seconds}")
+    private long refreshTokenExpiration;
 
     public SecurityUtils(JwtEncoder jwtEncoder) {
         this.jwtEncoder = jwtEncoder;
@@ -121,17 +126,35 @@ public class SecurityUtils {
     // authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority);
     // }
 
-    public String createToken(Authentication authentication) {
+    public String createAccessToken(Authentication authentication, ResLoginDTO.UserLogin loginDTO) {
 
         Instant now = Instant.now();
-        Instant validity = now.plus(this.jwtExpiration, ChronoUnit.SECONDS);
+        Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
         // @formatter:off
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuedAt(now)
             .expiresAt(validity)
             .subject(authentication.getName())
-            .claim("cheesethank", authentication)
+            .claim("user", loginDTO)
+            .build();
+
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+
+    public String createRefreshToken(String email, ResLoginDTO loginDTO) {
+
+        Instant now = Instant.now();
+        Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
+
+        // @formatter:off
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+            .issuedAt(now)
+            .expiresAt(validity)
+            .subject(email)
+            .claim("user", loginDTO)
             .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
