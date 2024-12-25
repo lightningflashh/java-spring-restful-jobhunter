@@ -56,7 +56,7 @@ public class AuthController {
                 // nạp thông tin (nếu xử lý thành công) vào SecurityContext
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                // create a token
+                // set thông tin người dùng vào context
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 ResLoginDTO res = new ResLoginDTO();
@@ -69,6 +69,7 @@ public class AuthController {
                         res.setUser(userLogin);
                 }
 
+                // create a token
                 String accessToken = this.securityUtil.createAccessToken(authentication, res.getUser());
 
                 res.setAccessToken(accessToken);

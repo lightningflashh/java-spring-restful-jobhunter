@@ -2,6 +2,8 @@ package vn.hoidanit.jobhunter.util;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -131,12 +133,19 @@ public class SecurityUtils {
         Instant now = Instant.now();
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
+        // Để test thôi! Sau này phân quyền sau
+        List<String> listAuthority = new ArrayList<>();
+
+        listAuthority.add("ROLE_USER_CREATE");
+        listAuthority.add("ROLE_USER_UPDATE");
+
         // @formatter:off
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuedAt(now)
             .expiresAt(validity)
             .subject(authentication.getName())
             .claim("user", loginDTO)
+            .claim("permission", listAuthority)
             .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
@@ -148,6 +157,7 @@ public class SecurityUtils {
 
         Instant now = Instant.now();
         Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
+
 
         // @formatter:off
         JwtClaimsSet claims = JwtClaimsSet.builder()
