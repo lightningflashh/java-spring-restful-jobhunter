@@ -5,6 +5,7 @@ import lombok.Setter;
 import vn.hoidanit.jobhunter.util.SecurityUtils;
 import vn.hoidanit.jobhunter.util.constant.LevelEnum;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.time.Instant;
 import java.util.List;
@@ -20,8 +21,10 @@ public class Job {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotBlank(message = "name không được để trống")
     private String name;
 
+    @NotBlank(message = "location không được để trống")
     private String location;
 
     private double salary;
