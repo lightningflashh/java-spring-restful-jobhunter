@@ -9,7 +9,7 @@ import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "jobs")
@@ -37,7 +37,7 @@ public class Job {
 
     private Instant endDate;
 
-    private boolean isActive;
+    private boolean active;
 
     private Instant createdAt;
 
@@ -52,7 +52,7 @@ public class Job {
     private Company company;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonIgnoreProperties(value = { "jobs" }) // Trả ra biến skills không chứa biến jobs
     @JoinTable(name = "job_skill", joinColumns = @JoinColumn(name = "job_id"), inverseJoinColumns = @JoinColumn(name = "skill_id"))
     private List<Skill> skills;
 
