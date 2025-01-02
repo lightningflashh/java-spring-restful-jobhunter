@@ -55,6 +55,6 @@ public class CompanyController {
         }
         this.companyService.handleDeleteCompany(id);
         // return ResponseEntity.ok("Delete successfully!");
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(null);
     }
 }
