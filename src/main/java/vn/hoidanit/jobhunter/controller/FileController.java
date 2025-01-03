@@ -16,9 +16,12 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -87,17 +90,30 @@ public class FileController {
 
     }
 
-    @GetMapping("/download/{filename}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable String filename) {
-        // Handle file download
-        // ...existing code...
-        return ResponseEntity.status(HttpStatus.OK).body(new byte[0]);
-    }
+    @GetMapping("/files")
+    @ApiMessage("Download a file successfully")
+    public ResponseEntity<Resource> downloadFile(
+            @RequestParam(name = "fileName", required = false) String fileName,
+            @RequestParam(name = "folder", required = false) String folder)
+            throws URISyntaxException, IOException, StorageException {
 
-    @DeleteMapping("/delete/{filename}")
-    public ResponseEntity<String> deleteFile(@PathVariable String filename) {
-        // Handle file deletion
-        // ...existing code...
-        return ResponseEntity.status(HttpStatus.OK).body("File deleted successfully");
+        // validate file
+        if (fileName == null || folder == null) {
+            throw new StorageException("File name or folder is empty. Please select a file to download.");
+        }
+
+        long fileLength = this.fileService.getFileLength(fileName, folder);
+        if (fileLength == 0) {
+            throw new StorageException("File not found.");
+        }
+
+        // handle downloading file
+        InputStreamResource resource = this.fileService.getResource(fileName, folder);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .contentLength(fileLength)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 }
