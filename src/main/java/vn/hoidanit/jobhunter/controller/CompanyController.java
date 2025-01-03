@@ -1,5 +1,7 @@
 package vn.hoidanit.jobhunter.controller;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.CompanyService;
+import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 @RestController
@@ -34,6 +37,13 @@ public class CompanyController {
     @GetMapping("/companies")
     public ResponseEntity<ResultPaginationDTO> getAllCompanies(@Filter Specification<Company> spec, Pageable pageable) {
         return ResponseEntity.ok(this.companyService.handleGetCompany(spec, pageable));
+    }
+
+    @GetMapping("/companies/{id}")
+    @ApiMessage("Fetch company by id")
+    public ResponseEntity<Company> getCompanyById(@PathVariable("id") long id) {
+        Optional<Company> company = this.companyService.findById(id);
+        return ResponseEntity.ok().body(company.get());
     }
 
     @PostMapping("/companies")
@@ -54,7 +64,6 @@ public class CompanyController {
             throw new IdInvalidException("Id khong lon hon 1500");
         }
         this.companyService.handleDeleteCompany(id);
-        // return ResponseEntity.ok("Delete successfully!");
         return ResponseEntity.ok(null);
     }
 }

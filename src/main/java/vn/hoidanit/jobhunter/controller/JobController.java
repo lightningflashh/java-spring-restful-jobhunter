@@ -56,7 +56,7 @@ public class JobController {
             throw new IdInvalidException("Job not found");
         }
         return ResponseEntity.ok()
-                .body(this.jobService.handleUpdateJob(job));
+                .body(this.jobService.handleUpdateJob(job, currentJob.get()));
     }
 
     @DeleteMapping("/jobs/{id}")
