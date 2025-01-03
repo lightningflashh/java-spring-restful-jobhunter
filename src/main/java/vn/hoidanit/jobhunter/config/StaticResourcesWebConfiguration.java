@@ -8,15 +8,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
 
-    @Value("${cheesethank.upload-file.base-path}")
-    private String basePath;
+    @Value("${cheesethank.upload-file.base-uri}")
+    private String baseUri;
 
     // Each time a request comes to /storage/**, it will point to the file storage
     // directory
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/storage/**")
-                .addResourceLocations(basePath);
+                .addResourceLocations(baseUri);
     }
 
 }
