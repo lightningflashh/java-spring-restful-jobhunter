@@ -31,6 +31,8 @@ public class ResUserDTO {
 
     private CompanyUser company;
 
+    private RoleUser role;
+
     @Getter
     @Setter
     @AllArgsConstructor
@@ -39,4 +41,14 @@ public class ResUserDTO {
         private long id;
         private String name;
     }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class RoleUser {
+        private long id;
+        private String name;
+    }
+
 }

@@ -151,7 +151,13 @@ public class SecurityUtils {
     // authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority);
     // }
 
-    public String createAccessToken(String email, ResLoginDTO.UserLogin loginDTO) {
+    public String createAccessToken(String email, ResLoginDTO loginDTO) {
+
+        ResLoginDTO.UserInsideToken userToken = new ResLoginDTO.UserInsideToken();
+        userToken.setId(loginDTO.getUser().getId());
+        userToken.setEmail(loginDTO.getUser().getEmail());
+        userToken.setName(loginDTO.getUser().getName());
+
         Instant now = Instant.now();
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
@@ -166,7 +172,7 @@ public class SecurityUtils {
             .issuedAt(now)
             .expiresAt(validity)
             .subject(email)
-            .claim("user", loginDTO)
+            .claim("user", userToken)
             .claim("permission", listAuthority)
             .build();
 
@@ -177,16 +183,20 @@ public class SecurityUtils {
 
     public String createRefreshToken(String email, ResLoginDTO loginDTO) {
 
+        ResLoginDTO.UserInsideToken userToken = new ResLoginDTO.UserInsideToken();
+        userToken.setId(loginDTO.getUser().getId());
+        userToken.setEmail(loginDTO.getUser().getEmail());
+        userToken.setName(loginDTO.getUser().getName());
+
         Instant now = Instant.now();
         Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
-
 
         // @formatter:off
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuedAt(now)
             .expiresAt(validity)
             .subject(email)
-            .claim("user", loginDTO)
+            .claim("user", userToken)
             .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

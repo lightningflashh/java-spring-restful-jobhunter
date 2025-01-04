@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.Company;
+import vn.hoidanit.jobhunter.domain.Role;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.response.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUpdateUserDTO;
@@ -24,9 +25,12 @@ public class UserService {
 
     private final CompanyService companyService;
 
-    public UserService(UserRepository userRepository, CompanyService companyService) {
+    private final RoleService roleService;
+
+    public UserService(UserRepository userRepository, CompanyService companyService, RoleService roleService) {
         this.userRepository = userRepository;
         this.companyService = companyService;
+        this.roleService = roleService;
     }
 
     public User handleCreateUser(User user) {
@@ -34,6 +38,12 @@ public class UserService {
         if (user.getCompany() != null) {
             Optional<Company> company = this.companyService.findById(user.getCompany().getId());
             user.setCompany(company.orElse(null));
+        }
+
+        // check role exist
+        if (user.getRole() != null) {
+            Role role = this.roleService.fetchById(user.getRole().getId());
+            user.setRole(role != null ? role : null);
         }
 
         return this.userRepository.save(user);
@@ -51,6 +61,12 @@ public class UserService {
             if (reqUser.getCompany() != null) {
                 Optional<Company> company = this.companyService.findById(reqUser.getCompany().getId());
                 currentUser.setCompany(company.orElse(null));
+            }
+
+            // check role exist
+            if (reqUser.getRole() != null) {
+                Role role = this.roleService.fetchById(reqUser.getRole().getId());
+                currentUser.setRole(role != null ? role : null);
             }
 
             // update
@@ -83,18 +99,7 @@ public class UserService {
 
         // remove sensitive data
         List<ResUserDTO> listUser = pageUser.getContent()
-                .stream().map(item -> new ResUserDTO(
-                        item.getId(),
-                        item.getEmail(),
-                        item.getName(),
-                        item.getGender(),
-                        item.getAddress(),
-                        item.getAge(),
-                        item.getUpdatedAt(),
-                        item.getCreatedAt(),
-                        new ResUserDTO.CompanyUser(
-                                item.getCompany() != null ? item.getCompany().getId() : 0,
-                                item.getCompany() != null ? item.getCompany().getName() : null)))
+                .stream().map(u -> this.convertToResUserDTO(u))
                 .collect(Collectors.toList());
 
         rs.setResult(listUser);
@@ -148,11 +153,20 @@ public class UserService {
     public ResUserDTO convertToResUserDTO(User user) {
         ResUserDTO res = new ResUserDTO();
         ResUserDTO.CompanyUser company = new ResUserDTO.CompanyUser();
+        ResUserDTO.RoleUser role = new ResUserDTO.RoleUser();
+
         if (user.getCompany() != null) {
             company.setId(user.getCompany().getId());
             company.setName(user.getCompany().getName());
             res.setCompany(company);
         }
+
+        if (user.getRole() != null) {
+            role.setId(user.getRole().getId());
+            role.setName(user.getRole().getName());
+            res.setRole(role);
+        }
+
         res.setId(user.getId());
         res.setEmail(user.getEmail());
         res.setName(user.getName());
