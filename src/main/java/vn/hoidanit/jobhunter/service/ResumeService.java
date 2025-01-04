@@ -28,13 +28,7 @@ import vn.hoidanit.jobhunter.util.SecurityUtils;
 @Service
 public class ResumeService {
 
-    @Autowired
-    FilterBuilder fb;
-
-    @Autowired
     private FilterParser filterParser;
-
-    @Autowired
     private FilterSpecificationConverter filterSpecificationConverter;
 
     private final ResumeRepository resumeRepository;
@@ -44,10 +38,14 @@ public class ResumeService {
     public ResumeService(
             ResumeRepository resumeRepository,
             UserRepository userRepository,
-            JobRepository jobRepository) {
+            JobRepository jobRepository,
+            FilterParser filterParser,
+            FilterSpecificationConverter filterSpecificationConverter) {
         this.resumeRepository = resumeRepository;
         this.userRepository = userRepository;
         this.jobRepository = jobRepository;
+        this.filterParser = filterParser;
+        this.filterSpecificationConverter = filterSpecificationConverter;
     }
 
     public boolean checkResumeExistByUserAndJob(Resume resume) {

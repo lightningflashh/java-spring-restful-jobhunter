@@ -43,6 +43,17 @@ public class GlobalExecption {
     }
 
     @ExceptionHandler(value = {
+            PermissionException.class,
+    })
+    public ResponseEntity<RestResponse<Object>> permissionException(Exception ex) {
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.FORBIDDEN.value());
+        res.setError(ex.getMessage());
+        res.setMessage("You don't have permission to access this resource...");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    }
+
+    @ExceptionHandler(value = {
             NoResourceFoundException.class,
     })
     public ResponseEntity<RestResponse<Object>> handleNotFoundException(Exception ex) {
