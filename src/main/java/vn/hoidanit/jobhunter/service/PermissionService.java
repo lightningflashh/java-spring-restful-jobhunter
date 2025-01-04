@@ -78,4 +78,8 @@ public class PermissionService {
         this.permissionRepository.delete(currentPermission);
     }
 
+    public boolean isExistName(Permission permission) {
+        return this.permissionRepository.existsByName(permission.getName());
+    }
+
 }
