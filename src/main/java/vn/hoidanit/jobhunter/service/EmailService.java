@@ -1,20 +1,19 @@
 package vn.hoidanit.jobhunter.service;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import vn.hoidanit.jobhunter.domain.Job;
 import vn.hoidanit.jobhunter.repository.JobRepository;
 
 @Service
@@ -55,13 +54,14 @@ public class EmailService {
         }
     }
 
-    public void sendEmailFromTemplateSync(String to, String subject, String templateName) {
+    @Async
+    public void sendEmailFromTemplateSync(
+            String to, String subject, String templateName, String username, Object value) {
         Context context = new Context();
-        List<Job> jobs = this.jobRepository.findAll();
 
-        String name = "CHEESETHANK";
-        context.setVariable("name", name);
-        context.setVariable("jobs", jobs);
+        context.setVariable("name", username);
+        // value is the jobs variable after filtering by the subscriber's skill
+        context.setVariable("jobs", value);
 
         String content = this.templateEngine.process(templateName, context);
         this.sendEmailSync(to, subject, content, false, true);
