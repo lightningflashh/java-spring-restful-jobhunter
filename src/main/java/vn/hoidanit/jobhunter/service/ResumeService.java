@@ -4,13 +4,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.turkraft.springfilter.builder.FilterBuilder;
+import com.turkraft.springfilter.converter.FilterSpecification;
 import com.turkraft.springfilter.converter.FilterSpecificationConverter;
 import com.turkraft.springfilter.parser.FilterParser;
 import com.turkraft.springfilter.parser.node.FilterNode;
@@ -127,9 +126,11 @@ public class ResumeService {
     public ResultPaginationDTO fetchAllResumeByUser(Pageable pageable) {
         // query builder
         // get current resume by email not get all resume
-        String email = SecurityUtils.getCurrentUserLogin().orElse(null);
+        String email = SecurityUtils.getCurrentUserLogin().isPresent() == true
+                ? SecurityUtils.getCurrentUserLogin().get()
+                : "";
         FilterNode node = filterParser.parse("email='" + email + "'");
-        Specification<Resume> spec = filterSpecificationConverter.convert(node);
+        FilterSpecification<Resume> spec = filterSpecificationConverter.convert(node);
         Page<Resume> pageResume = this.resumeRepository.findAll(spec, pageable);
 
         ResultPaginationDTO rs = new ResultPaginationDTO();
@@ -147,6 +148,7 @@ public class ResumeService {
         List<ResFetchResumeDTO> listResume = pageResume.getContent()
                 .stream().map(item -> this.getResume(item))
                 .collect(Collectors.toList());
+
         rs.setResult(listResume);
 
         return rs;
